@@ -32,13 +32,13 @@ try {
 
   section('1. Menu renders from the mocked API');
   await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
-  await waitFor(page, '[data-testid="menu-item"]');
-  ok((await count(page, '[data-testid="menu-item"]')) === 2, 'two menu items rendered');
-  ok(await isVisible(page, '[data-id="espresso"]'), 'mocked item "espresso" is shown (proves the mock, not the fallback, rendered)');
+  await waitFor(page, '[data-testid^="menu-item-"]');
+  ok((await count(page, '[data-testid^="menu-item-"]')) === 2, 'two menu items rendered');
+  ok(await isVisible(page, '[data-testid="menu-item-espresso"]'), 'mocked item "espresso" is shown (proves the mock, not the fallback, rendered)');
 
   section('2. Cart gates the order button');
   ok(await isDisabled(page, '[data-testid="place-order"]'), 'order disabled with empty cart');
-  await click(page, '[data-add="espresso"]');
+  await click(page, '[data-testid="add-espresso"]');
   ok((await text(page, '[data-testid="cart-count"]')) === '1', 'cart count = 1 after add');
   ok(!(await isDisabled(page, '[data-testid="place-order"]')), 'order enabled once cart has an item');
 

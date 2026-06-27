@@ -10,7 +10,7 @@
  */
 import {
   run, launch, openPage, mockApi, BASE,
-  isDisabled, text, waitFor, isVisible,
+  isDisabled, text, waitFor, isVisible, realErrors,
 } from '../../../Sources/runthrough.mjs';
 
 const { ok, section, finish } = run('Tiny Café — seeded cart (Seam B: state seed)');
@@ -28,17 +28,19 @@ try {
 
   section('1. App boots straight into the seeded cart');
   await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
-  await waitFor(page, '[data-testid="menu-item"]');
+  await waitFor(page, '[data-testid^="menu-item-"]');
   ok((await text(page, '[data-testid="cart-count"]')) === '2', 'cart count = 2 from the seed (no clicks)');
-  ok(!(await isDisabled(page, '[data-testid="place-order"]')), 'order button enabled immediately — checkout is testable in isolation');
+  ok(!(await isDisabled(page, '[data-testid="place-order"]')), 'order button enabled immediately, so checkout is testable in isolation');
+  ok(realErrors(page).length === 0, `no console/page errors on the seeded boot (${realErrors(page).length})`);
 
   section('2. A fresh context has an empty cart (seed is per-context, not sticky)');
   const fresh = await openPage(browser);
   await mockApi(fresh, { 'GET **/api/menu': { items: [{ id: 'latte', name: 'Latte', price: 4.5 }] } });
   await fresh.goto(`${BASE}/`, { waitUntil: 'networkidle' });
-  await waitFor(fresh, '[data-testid="menu-item"]');
-  ok((await text(fresh, '[data-testid="cart-count"]')) === '0', 'unseeded context starts empty — no test leaks into the next');
+  await waitFor(fresh, '[data-testid^="menu-item-"]');
+  ok((await text(fresh, '[data-testid="cart-count"]')) === '0', 'unseeded context starts empty, so no test leaks into the next');
   ok(await isDisabled(fresh, '[data-testid="place-order"]'), 'order disabled in the fresh context');
+  ok(realErrors(fresh).length === 0, `fresh context also error-free (${realErrors(fresh).length})`);
 } finally {
   await browser.close();
 }

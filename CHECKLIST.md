@@ -6,8 +6,10 @@ under an hour. Steps 1–2 prove the kit works before you touch your own code.
 ---
 
 ### 0. Prerequisites
-- [ ] Node 18+ and a Chrome install on the machine (the kit drives system Chrome
-      via `channel: 'chrome'`; swap to bundled Chromium with `launch({ channel: undefined })`).
+- [ ] Node 18+ and Google Chrome on the machine (the kit drives system Chrome via
+      `channel: 'chrome'`). No Chrome? Run `npx playwright install chromium` once;
+      the kit falls back to bundled Chromium automatically, or force it with
+      `launch({ channel: undefined })`.
 
 ### 1. See the demo go green (before touching your app)
 - [ ] `npm install` (Playwright is the one dependency).

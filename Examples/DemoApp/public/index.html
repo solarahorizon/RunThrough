@@ -80,12 +80,11 @@
     ul.innerHTML = '';
     for (const it of items) {
       const li = document.createElement('li');
-      li.dataset.testid = 'menu-item';
-      li.dataset.id = it.id;
+      li.dataset.testid = `menu-item-${it.id}`;
       li.innerHTML = `<span>${it.name} <span class="muted">$${it.price.toFixed(2)}</span></span>`;
       const add = document.createElement('button');
       add.textContent = 'Add';
-      add.dataset.add = it.id;
+      add.dataset.testid = `add-${it.id}`;
       add.addEventListener('click', () => {
         cart.set(it.id, (cart.get(it.id) || 0) + 1);
         persist(); renderCart();

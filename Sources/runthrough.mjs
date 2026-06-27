@@ -63,10 +63,28 @@ export function run(title = '') {
  * 2. Browser + page — system Chrome, with console/page errors captured for you.
  * -------------------------------------------------------------------------- */
 export async function launch(opts = {}) {
-  // `channel: 'chrome'` uses the Chrome already on the machine — no extra
-  // browser download. Pass { channel: undefined } to use Playwright's bundled
-  // Chromium instead, or { headless: false } to watch it drive.
-  return chromium.launch({ channel: 'chrome', ...opts });
+  // Default to the Chrome already on the machine (`channel: 'chrome'`) — no extra
+  // browser download. Pass { channel: undefined } to force Playwright's bundled
+  // Chromium, or { headless: false } to watch it drive. If system Chrome is
+  // missing, fall back to bundled Chromium automatically; if neither is present,
+  // throw a message that says exactly how to fix it.
+  const channel = 'channel' in opts ? opts.channel : 'chrome';
+  const { channel: _drop, ...rest } = opts;
+  try {
+    return await chromium.launch(channel ? { channel, ...rest } : rest);
+  } catch (err) {
+    if (!channel) throw err; // caller explicitly asked for bundled Chromium
+    try {
+      return await chromium.launch(rest); // system Chrome not found → bundled Chromium
+    } catch {
+      throw new Error(
+        'Run-Through could not launch a browser.\n' +
+        'Install Google Chrome, or fetch Playwright\'s bundled Chromium with:\n' +
+        '  npx playwright install chromium\n' +
+        `(original error: ${err.message})`
+      );
+    }
+  }
 }
 
 /**
@@ -136,7 +154,10 @@ export async function mockApi(target, routes) {
  */
 export function capture(page, matcher) {
   const hits = [];
-  page.on('request', (r) => { try { if (matcher(r)) hits.push(r); } catch { /* ignore */ } });
+  // Let a broken matcher surface loudly: a typo that throws should fail the test,
+  // not silently report "no request captured". Keep matchers null-safe themselves
+  // (e.g. `r.postData() || ''`).
+  page.on('request', (r) => { if (matcher(r)) hits.push(r); });
   return { get: () => hits[hits.length - 1] || null, all: () => hits.slice() };
 }
 

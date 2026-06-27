@@ -13,26 +13,29 @@
  */
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { join, normalize, extname } from 'node:path';
+import { join, extname, resolve, sep } from 'node:path';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png',
-  '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
+  '.json': 'application/json', '.map': 'application/json', '.svg': 'image/svg+xml',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
+  '.wasm': 'application/wasm',
 };
 
 export function serve(root, port = 8765) {
+  const rootAbs = resolve(root);
   const server = createServer(async (req, res) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.writeHead(501, { 'content-type': 'text/plain' });
-      return res.end('501 — static server only serves GET/HEAD. Mock your API in-test.');
+      return res.end('501 (static server serves GET/HEAD only). Mock your API in-test.');
     }
     try {
-      // strip query, prevent path traversal, default to index.html
-      let pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-      let filePath = normalize(join(root, pathname)).replace(/\0/g, '');
-      if (!filePath.startsWith(normalize(root))) { res.writeHead(403); return res.end('403'); }
+      // strip query + NUL, resolve under root (boundary-checked), default to index.html
+      const pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\0/g, '');
+      let filePath = resolve(rootAbs, '.' + pathname);
+      if (filePath !== rootAbs && !filePath.startsWith(rootAbs + sep)) { res.writeHead(403); return res.end('403'); }
       let info = await stat(filePath).catch(() => null);
       if (info && info.isDirectory()) { filePath = join(filePath, 'index.html'); info = await stat(filePath).catch(() => null); }
       if (!info) { res.writeHead(404, { 'content-type': 'text/plain' }); return res.end('404'); }

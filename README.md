@@ -85,6 +85,10 @@ npm install            # Playwright is the one dependency
 npm run demo           # serves the demo app + runs both specs → all green
 ```
 
+The demo drives your **system Google Chrome** (no extra browser download). No
+Chrome on the machine? Run `npx playwright install chromium` once and the kit
+falls back to bundled Chromium automatically.
+
 Then, to adopt it in your own project:
 
 1. Copy **`Sources/runthrough.mjs`** into your project's `tests/` directory (byte-identical).
