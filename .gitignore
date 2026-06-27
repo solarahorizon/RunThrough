@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Test artifacts (screenshots, traces a spec may drop)
+*.png
+*.webm
+test-results/
+playwright-report/

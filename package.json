@@ -1,0 +1,18 @@
+{
+  "name": "run-through",
+  "version": "0.1.0",
+  "description": "Playwright-style UX testing for web apps, packaged: the two seams (mock-the-API / seed-the-state) and a dozen helpers, as one file you copy into your tests/ directory. No runner, no config, no DSL.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "playwright", "e2e", "ux-testing", "end-to-end", "web", "webview",
+    "react-native-webview", "capacitor", "testing", "no-framework"
+  ],
+  "scripts": {
+    "demo": "node Scripts/run-specs.mjs Examples/DemoApp/public Examples/DemoApp/tests",
+    "serve:demo": "node Scripts/serve.mjs Examples/DemoApp/public 8765"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.0"
+  }
+}
