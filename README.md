@@ -102,6 +102,17 @@ Then, to adopt it in your own project:
 
 Full numbered walkthrough: [`CHECKLIST.md`](CHECKLIST.md).
 
+## Adopting this with a coding agent
+
+Handing this to Claude, Cursor, Copilot, or any coding agent? Point it at
+**[`AGENTS.md`](AGENTS.md)** — the agent-facing adoption guide. It gives the agent
+the one rule (copy the file, don't reinvent a pattern), the ordered steps, a
+canonical spec skeleton, and the invariants not to violate, so the tests it writes
+come out in the kit's idiom instead of a freshly-improvised architecture. That's
+the point of a kit in the agent era: it's a **validated prior for your agent**, so
+neither you nor it re-litigates the same setup decisions every project. (Claude
+Code auto-discovers it via the [`CLAUDE.md`](CLAUDE.md) stub.)
+
 ## What's in scope
 
 - **One copy-in helper file**, `Sources/runthrough.mjs` — the ✓/✗ harness,
